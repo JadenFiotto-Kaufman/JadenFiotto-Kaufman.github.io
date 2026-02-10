@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jaden Fiotto-Kaufman</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; overflow: hidden; }
@@ -34,56 +35,148 @@
   .pill a {
     color: #222;
     text-decoration: none;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 24px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    line-height: 1.1;
+    white-space: pre;
+    display: block;
+    transition: opacity 0.15s;
   }
   .pill a:hover {
-    text-decoration: underline;
+    opacity: 0.55;
   }
   #mute {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+    position: fixed;
     z-index: 2;
     background: none;
     border: none;
     font-size: 28px;
     cursor: pointer;
     line-height: 1;
+    color: black;
   }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <audio id="audio" src="music.mp3" loop></audio>
-<button id="mute" title="Toggle sound">&#x1F4E3;</button>
+<button id="mute" title="Toggle sound"><i class="fas fa-volume-mute"></i></button>
 <div class="pill">
-  <a href="https://github.com/JadenFiotto-Kaufman">GitHub</a>
-  <a href="https://x.com/home">Twitter</a>
-  <a href="https://scholar.google.com/citations?user=Ch043PoAAAAJ&hl=en">Scholar</a>
-  <a href="JadenFiotto-Kaufman_Resume.pdf">Resume</a>
+  <a id="link-github" href="https://github.com/JadenFiotto-Kaufman" target="_blank" rel="noopener noreferrer"></a>
+  <a id="link-scholar" href="https://scholar.google.com/citations?user=Ch043PoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer"></a>
+  <a id="link-resume" href="JadenFiotto-Kaufman_Resume.pdf" target="_blank" rel="noopener noreferrer"></a>
 </div>
 <script>
+const asciiVariants = {
+  github: [
+    "┏┓• ┓   ┓ \n┃┓┓╋┣┓┓┏┣┓\n┗┛┗┗┛┗┗┻┗┛",
+    "░█▀▀░▀█▀░▀█▀░█░█░█░█░█▀▄\n░█░█░░█░░░█░░█▀█░█░█░█▀▄\n░▀▀▀░▀▀▀░░▀░░▀░▀░▀▀▀░▀▀░",
+    "╔═╗┬┌┬┐┬ ┬┬ ┬┌┐ \n║ ╦│ │ ├─┤│ │├┴┐\n╚═╝┴ ┴ ┴ ┴└─┘└─┘"
+  ],
+  scholar: [
+    " ⢎⡑ ⢀⣀ ⣇⡀ ⢀⡀ ⡇ ⢀⣀ ⡀⣀\n ⠢⠜ ⠣⠤ ⠇⠸ ⠣⠜ ⠣ ⠣⠼ ⠏ ",
+    "Ｓｃｈｏｌａｒ",
+    "╔═╗┌─┐┬ ┬┌─┐┬  ┌─┐┬─┐\n╚═╗│  ├─┤│ ││  ├─┤├┬┘\n╚═╝└─┘┴ ┴└─┘┴─┘┴ ┴┴└─",
+    "░█▀▀░█▀▀░█░█░█▀█░█░░░█▀█░█▀▄\n░▀▀█░█░░░█▀█░█░█░█░░░█▀█░█▀▄\n░▀▀▀░▀▀▀░▀░▀░▀▀▀░▀▀▀░▀░▀░▀░▀"
+  ],
+  resume: [
+    "╦═╗┌─┐┌─┐┬ ┬┌┬┐┌─┐\n╠╦╝├┤ └─┐│ ││││├┤ \n╩╚═└─┘└─┘└─┘┴ ┴└─┘",
+    "┏━┃┏━┛┏━┛┃ ┃┏┏ ┏━┛\n┏┏┛┏━┛━━┃┃ ┃┃┃┃┏━┛\n┛ ┛━━┛━━┛━━┛┛┛┛━━┛",
+    "░█▀▄░█▀▀░█▀▀░█░█░█▄█░█▀▀\n░█▀▄░█▀▀░▀▀█░█░█░█░█░█▀▀\n░▀░▀░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀▀▀"
+  ]
+};
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const links = [
+  { el: document.getElementById('link-github'), variants: asciiVariants.github },
+  { el: document.getElementById('link-scholar'), variants: asciiVariants.scholar },
+  { el: document.getElementById('link-resume'), variants: asciiVariants.resume }
+];
+
+links.forEach(link => {
+  link.el.textContent = pickRandom(link.variants);
+});
+
+setInterval(() => {
+  const link = pickRandom(links);
+  link.el.textContent = pickRandom(link.variants);
+  const rot = (Math.random() * 10 - 5).toFixed(1);
+  const tx = (Math.random() * 10 - 5).toFixed(1);
+  const ty = (Math.random() * 10 - 5).toFixed(1);
+  link.el.style.transform = `rotate(${rot}deg) translate(${tx}px, ${ty}px)`;
+}, 5000);
+
 const audio = document.getElementById('audio');
 const muteBtn = document.getElementById('mute');
 let playing = false;
 
-document.addEventListener('click', () => {
+// Position mute button centered above the pill initially
+const pillRect = document.querySelector('.pill').getBoundingClientRect();
+const btnW = muteBtn.offsetWidth;
+muteBtn.style.left = (pillRect.left + pillRect.width / 2 - btnW / 2) + 'px';
+muteBtn.style.top = (pillRect.top - 40) + 'px';
+
+let muteX, muteY, muteDx, muteDy, muteAngle = 0, muteFloating = false;
+
+function startMuteFloat() {
+  if (muteFloating) return;
+  muteFloating = true;
+  const rect = muteBtn.getBoundingClientRect();
+  muteX = rect.left;
+  muteY = rect.top;
+  const speed = 0.5;
+  const angle = Math.random() * Math.PI * 2;
+  muteDx = Math.cos(angle) * speed;
+  muteDy = Math.sin(angle) * speed;
+
+  function floatStep() {
+    muteX += muteDx;
+    muteY += muteDy;
+    muteAngle += 0.3;
+    const w = muteBtn.offsetWidth;
+    const h = muteBtn.offsetHeight;
+    if (muteX <= 0 || muteX + w >= window.innerWidth) muteDx *= -1;
+    if (muteY <= 0 || muteY + h >= window.innerHeight) muteDy *= -1;
+    muteX = Math.max(0, Math.min(muteX, window.innerWidth - w));
+    muteY = Math.max(0, Math.min(muteY, window.innerHeight - h));
+    muteBtn.style.left = muteX + 'px';
+    muteBtn.style.top = muteY + 'px';
+    muteBtn.style.transform = `rotate(${muteAngle}deg)`;
+    requestAnimationFrame(floatStep);
+  }
+  requestAnimationFrame(floatStep);
+}
+
+function firstPlay() {
   if (!playing) {
     audio.play();
     playing = true;
+    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    startMuteFloat();
   }
-}, { once: true });
+}
+
+document.addEventListener('click', firstPlay, { once: true });
 
 muteBtn.addEventListener('click', (e) => {
   e.stopPropagation();
-  if (audio.paused) {
+  if (!playing) {
     audio.play();
     playing = true;
-    muteBtn.textContent = '\u{1F4E3}';
+    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    startMuteFloat();
+    document.removeEventListener('click', firstPlay);
+    return;
+  }
+  if (audio.paused) {
+    audio.play();
+    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
   } else {
     audio.pause();
-    muteBtn.textContent = '\u{1F507}';
+    muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
   }
 });
 
