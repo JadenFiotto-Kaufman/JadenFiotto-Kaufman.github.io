@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaden Fiotto-Kaufman</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  .pill {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse at center, #fffee8 30%, #fffee8 50%, transparent 73%);
+    border-radius: 9999px;
+    padding: 120px 240px;
+    display: flex;
+    gap: 72px;
+    align-items: center;
+    z-index: 1;
+  }
+  .pill a {
+    color: #222;
+    text-decoration: none;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 24px;
+  }
+  .pill a:hover {
+    text-decoration: underline;
+  }
+  #mute {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<audio id="audio" src="music.mp3" loop></audio>
+<button id="mute" title="Toggle sound">&#x1F4E3;</button>
+<div class="pill">
+  <a href="https://github.com/JadenFiotto-Kaufman">GitHub</a>
+  <a href="https://x.com/home">Twitter</a>
+  <a href="https://scholar.google.com/citations?user=Ch043PoAAAAJ&hl=en">Scholar</a>
+  <a href="JadenFiotto-Kaufman_Resume.pdf">Resume</a>
+</div>
+<script>
+const audio = document.getElementById('audio');
+const muteBtn = document.getElementById('mute');
+let playing = false;
+
+document.addEventListener('click', () => {
+  if (!playing) {
+    audio.play();
+    playing = true;
+  }
+}, { once: true });
+
+muteBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (audio.paused) {
+    audio.play();
+    playing = true;
+    muteBtn.textContent = '\u{1F4E3}';
+  } else {
+    audio.pause();
+    muteBtn.textContent = '\u{1F507}';
+  }
+});
+
+const PIXEL_SIZE = 4;
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const img = new Image();
+img.src = 'cg.png';
+img.onload = () => {
+  const w = Math.ceil(img.width / PIXEL_SIZE);
+  const h = Math.ceil(img.height / PIXEL_SIZE);
+  canvas.width = w;
+  canvas.height = h;
+
+  let angle = 0;
+  const cx = w / 2;
+  const cy = h / 2;
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    const s = 1.5;
+    ctx.scale(s, s);
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+    ctx.restore();
+    angle += 0.0005;
+    requestAnimationFrame(draw);
+  }
+  draw();
+};
+</script>
+</body>
+</html>
