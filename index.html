@@ -90,6 +90,18 @@
       font-size: 10px;
     }
   }
+  #static-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
   #mute {
     position: fixed;
     z-index: 2;
@@ -104,7 +116,9 @@
 </head>
 <body>
 <canvas id="c"></canvas>
+<canvas id="static-overlay"></canvas>
 <audio id="audio" src="music.mp3" loop></audio>
+<audio id="static-audio" src="static.mp3"></audio>
 <button id="mute" title="Toggle sound"><i class="fas fa-volume-mute"></i></button>
 <div class="pill">
   <a id="link-github" href="https://github.com/JadenFiotto-Kaufman" target="_blank" rel="noopener noreferrer"></a>
@@ -165,6 +179,55 @@ muteBtn.style.left = (pillRect.left + pillRect.width / 2 - btnW / 2) + 'px';
 muteBtn.style.top = (pillRect.top - 40) + 'px';
 
 let muteX, muteY, muteDx, muteDy, muteAngle = 0, muteFloating = false;
+const BASE_SPEED = 0.5;
+const FRICTION = 0.97;
+const IMPACT_THRESHOLD = 4;
+
+// Static effect
+const staticCanvas = document.getElementById('static-overlay');
+const staticCtx = staticCanvas.getContext('2d');
+const staticAudio = document.getElementById('static-audio');
+let staticActive = false;
+let staticTimer = null;
+
+function triggerStatic() {
+  if (staticActive) return;
+  staticActive = true;
+  staticCanvas.width = Math.ceil(window.innerWidth / 4);
+  staticCanvas.height = Math.ceil(window.innerHeight / 4);
+  staticCanvas.style.opacity = '0.6';
+  staticAudio.currentTime = 0;
+  staticAudio.play();
+  audio.volume = 0.1;
+
+  function drawStatic() {
+    if (!staticActive) return;
+    const w = staticCanvas.width;
+    const h = staticCanvas.height;
+    const imageData = staticCtx.createImageData(w, h);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const v = Math.random() * 255;
+      data[i] = v;
+      data[i + 1] = v;
+      data[i + 2] = v;
+      data[i + 3] = 200;
+    }
+    staticCtx.putImageData(imageData, 0, 0);
+    requestAnimationFrame(drawStatic);
+  }
+  drawStatic();
+
+  clearTimeout(staticTimer);
+  staticTimer = setTimeout(() => {
+    staticActive = false;
+    staticCanvas.style.opacity = '0';
+    staticAudio.pause();
+    audio.volume = 1;
+  }, 250);
+}
+let dragging = false, dragOffsetX, dragOffsetY, didDrag = false;
+let dragHistory = [];
 
 function startMuteFloat() {
   if (muteFloating) return;
@@ -172,21 +235,36 @@ function startMuteFloat() {
   const rect = muteBtn.getBoundingClientRect();
   muteX = rect.left;
   muteY = rect.top;
-  const speed = 0.5;
   const angle = Math.random() * Math.PI * 2;
-  muteDx = Math.cos(angle) * speed;
-  muteDy = Math.sin(angle) * speed;
+  muteDx = Math.cos(angle) * BASE_SPEED;
+  muteDy = Math.sin(angle) * BASE_SPEED;
 
   function floatStep() {
-    muteX += muteDx;
-    muteY += muteDy;
-    muteAngle += 0.3;
-    const w = muteBtn.offsetWidth;
-    const h = muteBtn.offsetHeight;
-    if (muteX <= 0 || muteX + w >= window.innerWidth) muteDx *= -1;
-    if (muteY <= 0 || muteY + h >= window.innerHeight) muteDy *= -1;
-    muteX = Math.max(0, Math.min(muteX, window.innerWidth - w));
-    muteY = Math.max(0, Math.min(muteY, window.innerHeight - h));
+    if (!dragging) {
+      // Decay speed toward base float speed
+      const speed = Math.sqrt(muteDx * muteDx + muteDy * muteDy);
+      if (speed > BASE_SPEED) {
+        muteDx *= FRICTION;
+        muteDy *= FRICTION;
+        // Clamp to base speed once close enough
+        const newSpeed = Math.sqrt(muteDx * muteDx + muteDy * muteDy);
+        if (newSpeed < BASE_SPEED) {
+          muteDx = (muteDx / newSpeed) * BASE_SPEED;
+          muteDy = (muteDy / newSpeed) * BASE_SPEED;
+        }
+      }
+      muteX += muteDx;
+      muteY += muteDy;
+      muteAngle += 0.3;
+      const w = muteBtn.offsetWidth;
+      const h = muteBtn.offsetHeight;
+      let hitEdge = false;
+      if (muteX <= 0 || muteX + w >= window.innerWidth) { muteDx *= -1; hitEdge = true; }
+      if (muteY <= 0 || muteY + h >= window.innerHeight) { muteDy *= -1; hitEdge = true; }
+      if (hitEdge && speed > IMPACT_THRESHOLD) triggerStatic();
+      muteX = Math.max(0, Math.min(muteX, window.innerWidth - w));
+      muteY = Math.max(0, Math.min(muteY, window.innerHeight - h));
+    }
     muteBtn.style.left = muteX + 'px';
     muteBtn.style.top = muteY + 'px';
     muteBtn.style.transform = `rotate(${muteAngle}deg)`;
@@ -195,8 +273,57 @@ function startMuteFloat() {
   requestAnimationFrame(floatStep);
 }
 
+function onDragStart(e) {
+  if (!muteFloating) return;
+  e.preventDefault();
+  dragging = true;
+  didDrag = false;
+  dragHistory = [];
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  dragOffsetX = clientX - muteX;
+  dragOffsetY = clientY - muteY;
+}
+
+function onDragMove(e) {
+  if (!dragging) return;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  muteX = clientX - dragOffsetX;
+  muteY = clientY - dragOffsetY;
+  didDrag = true;
+  const now = performance.now();
+  dragHistory.push({ x: clientX, y: clientY, t: now });
+  // Keep only last 80ms of history for velocity calculation
+  while (dragHistory.length > 1 && now - dragHistory[0].t > 80) dragHistory.shift();
+}
+
+function onDragEnd() {
+  if (!dragging) return;
+  dragging = false;
+  // Calculate throw velocity from recent drag history
+  if (dragHistory.length >= 2) {
+    const first = dragHistory[0];
+    const last = dragHistory[dragHistory.length - 1];
+    const dt = last.t - first.t;
+    if (dt > 0) {
+      // Pixels per ms -> pixels per frame (~16ms)
+      muteDx = ((last.x - first.x) / dt) * 8;
+      muteDy = ((last.y - first.y) / dt) * 8;
+    }
+  }
+}
+
+muteBtn.addEventListener('mousedown', onDragStart);
+muteBtn.addEventListener('touchstart', onDragStart, { passive: false });
+document.addEventListener('mousemove', onDragMove);
+document.addEventListener('touchmove', onDragMove, { passive: true });
+document.addEventListener('mouseup', onDragEnd);
+document.addEventListener('touchend', onDragEnd);
+
 muteBtn.addEventListener('click', (e) => {
   e.stopPropagation();
+  if (didDrag) return; // Ignore click after drag
   if (!playing) {
     audio.play();
     playing = true;
