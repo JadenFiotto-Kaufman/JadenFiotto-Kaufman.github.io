@@ -1,0 +1,46 @@
+# Jaden Fiotto-Kaufman
+
+> Sr. Principal Research Software Engineer at Northeastern University. Building tools to democratize access to the internals of large pre-trained models. Creator of NNsight and architect of NDIF.
+
+## Links
+
+- [GitHub](https://github.com/JadenFiotto-Kaufman)
+- [Google Scholar](https://scholar.google.com/citations?user=Ch043PoAAAAJ&hl=en)
+- [Resume (PDF)](https://jadenfiotto-kaufman.github.io/JadenFiotto-Kaufman_Resume.pdf)
+- [Personal Website](https://jadenfiotto-kaufman.github.io/)
+
+## Current Work
+
+National Deep Inference Fabric (NDIF) — Northeastern University, Oct 2023 to present. Directed engineering on a $9M NSF grant for democratizing research access to large pre-trained models. Designed and developed NNsight, an open-source Python library for intervening on and interpreting neural network internals. Architected NDIF, a shared inference service supporting models with 400B+ parameters. Built and supervised an engineering team. Deployed services on AWS and Delta (NCSA). Managed partnerships with Anthropic, Goodfire, Transluce, and NCSA.
+
+## Key Projects
+
+- **NNsight**: Open-source library for accessing, manipulating, and interpreting the internals of deep learning models. Enables mechanistic interpretability research at scale. [GitHub](https://github.com/ndif-team/nnsight)
+- **NDIF**: National Deep Inference Fabric — a shared research infrastructure providing transparent access to foundation model internals for the academic community. [Website](https://ndif.us)
+
+## Publications
+
+- **Erasing Concepts from Diffusion Models** (ICCV 2023)
+- **NNsight and NDIF: Democratizing Access to Foundation Model Internals** (arXiv 2024)
+- **MIB: A Mechanistic Interpretability Benchmark** (arXiv 2025)
+- **Hidden Layers: An Interactive Installation for Neural Semantics** (Aarhus Conference on Creativity and AI 2025)
+- **EQUAS: Explainable Question Answering System** (Applied AI Letters 2021)
+
+## Prior Experience
+
+- Raytheon BBN Technologies (Dec 2019 – Oct 2023): Senior Scientist. DARPA SAIL-ON program, ASTARTE aircraft path prediction, Explainable AI (XAI).
+- Boston Digital (Sep 2017 – Dec 2019): .NET Developer. Angular, C# .NET RESTful APIs.
+
+## Education
+
+- MS, Artificial Intelligence — Northeastern University (April 2023), GPA 3.7/4.0. Thesis on semantic representation in Stable Diffusion.
+- BS, Computer Science (Minor in Mathematics) — Wentworth Institute of Technology (April 2018), GPA 3.58/4.0. Cum Laude.
+
+## Technical Skills
+
+Mechanistic interpretability, ML operations, PyTorch, diffusion models, LLMs, computer vision, RESTful APIs, WebSockets, AWS, React, Vue, Hugging Face, Python, C#, Java, JavaScript, C++, C, SQL.
+
+## Contact
+
+- Email: jadenfk@outlook.com
+- Location: Somerville, MA
