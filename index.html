@@ -71,6 +71,25 @@
   .pill a:hover {
     opacity: 0.55;
   }
+  @media (max-width: 768px) {
+    .pill {
+      flex-direction: column;
+      padding: 80px 60px;
+      gap: 36px;
+    }
+    .pill a {
+      font-size: 12px;
+    }
+  }
+  @media (max-width: 420px) {
+    .pill {
+      padding: 60px 40px;
+      gap: 28px;
+    }
+    .pill a {
+      font-size: 10px;
+    }
+  }
   #mute {
     position: fixed;
     z-index: 2;
@@ -176,17 +195,6 @@ function startMuteFloat() {
   requestAnimationFrame(floatStep);
 }
 
-function firstPlay() {
-  if (!playing) {
-    audio.play();
-    playing = true;
-    muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    startMuteFloat();
-  }
-}
-
-document.addEventListener('click', firstPlay, { once: true });
-
 muteBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   if (!playing) {
@@ -194,7 +202,6 @@ muteBtn.addEventListener('click', (e) => {
     playing = true;
     muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
     startMuteFloat();
-    document.removeEventListener('click', firstPlay);
     return;
   }
   if (audio.paused) {
