@@ -159,14 +159,28 @@ links.forEach(link => {
   link.el.textContent = pickRandom(link.variants);
 });
 
-setInterval(() => {
+function shuffleLink() {
   const link = pickRandom(links);
   link.el.textContent = pickRandom(link.variants);
   const rot = (Math.random() * 10 - 5).toFixed(1);
   const tx = (Math.random() * 10 - 5).toFixed(1);
   const ty = (Math.random() * 10 - 5).toFixed(1);
   link.el.style.transform = `rotate(${rot}deg) translate(${tx}px, ${ty}px)`;
-}, 5000);
+}
+
+setInterval(shuffleLink, 5000);
+
+let staticShuffleInterval = null;
+function startStaticShuffle() {
+  if (staticShuffleInterval) return;
+  staticShuffleInterval = setInterval(shuffleLink, 50);
+}
+function stopStaticShuffle() {
+  clearInterval(staticShuffleInterval);
+  staticShuffleInterval = null;
+  // Reset all link transforms back to neutral
+  links.forEach(link => { link.el.style.transform = ''; });
+}
 
 const audio = document.getElementById('audio');
 const muteBtn = document.getElementById('mute');
@@ -199,6 +213,7 @@ function triggerStatic() {
   staticAudio.currentTime = 0;
   staticAudio.play();
   audio.volume = 0.1;
+  startStaticShuffle();
 
   function drawStatic() {
     if (!staticActive) return;
@@ -224,6 +239,7 @@ function triggerStatic() {
     staticCanvas.style.opacity = '0';
     staticAudio.pause();
     audio.volume = 1;
+    stopStaticShuffle();
   }, 250);
 }
 let dragging = false, dragOffsetX, dragOffsetY, didDrag = false;
